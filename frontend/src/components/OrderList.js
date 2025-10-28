@@ -1,31 +1,32 @@
 // src/components/OrderList.js
-import React, { useState, useEffect } from "react";
-import "./OrderList.css";
+import React, { useState, useEffect } from 'react';
+import './OrderList.css';
+
+// Add this line at the top
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function OrderList() {
-  // State: Data that can change and cause re-renders
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useEffect: Runs code after component renders
   useEffect(() => {
     fetchOrders();
   }, []);
 
-  // Async function to fetch data
   const fetchOrders = async () => {
     try {
       setLoading(true);
-
-      const response = await fetch("http://localhost:5000/api/orders");
-
+      
+      // Use API_URL variable
+      const response = await fetch(`${API_URL}/api/orders`);
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch orders");
+        throw new Error('Failed to fetch orders');
       }
-
+      
       const data = await response.json();
-
+      
       setOrders(data.data);
       setLoading(false);
     } catch (err) {
@@ -46,7 +47,7 @@ function OrderList() {
     <div className="order-list-container">
       <h2>Orders ({orders.length})</h2>
       <div className="orders-grid">
-        {orders.map((order) => (
+        {orders.map(order => (
           <div key={order.id} className="order-card">
             <h3>{order.studentName}</h3>
             <p>{order.room}</p>
@@ -55,8 +56,9 @@ function OrderList() {
               {order.items.map((item, index) => (
                 <li key={index}>
                   {item.quantity}x {item.name}
-                  {item.customizations.length > 0 &&
-                    ` (${item.customizations.join(", ")})`}
+                  {item.customizations.length > 0 && 
+                    ` (${item.customizations.join(', ')})`
+                  }
                 </li>
               ))}
             </ul>
