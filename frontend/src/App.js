@@ -1,20 +1,30 @@
-// src/App.js
 import React from 'react';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import MenuPage from './components/MenuPage';
+import AboutPage from './components/AboutPage';
 import OrderList from './components/OrderList';
+import Cart from './components/Cart';
+import { CartProvider } from './hooks/useCart';
+import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Naru Sushi Order Management</h1>
-        <p>School Lunch Order System</p>0
-      </header>
-
-      <main className="App-main">
-        <OrderList />
-      </main>
-    </div>
+    <CartProvider>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<MenuPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/admin" element={<OrderList />} />
+            </Routes>
+          </main>
+          <Cart />
+        </div>
+      </Router>
+    </CartProvider>
   );
 }
 
