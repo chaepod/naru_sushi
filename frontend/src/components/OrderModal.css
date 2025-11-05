@@ -1,0 +1,185 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #7f8c8d;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.modal-close:hover { 
+  background: #ecf0f1; 
+}
+
+.modal-header {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.modal-item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.modal-item-info h2 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.modal-item-description {
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+
+.modal-item-price {
+  color: #27ae60;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.modal-form { 
+  padding: 2rem; 
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.input-error { 
+  border-color: #e74c3c !important; 
+}
+
+.error-message {
+  display: block;
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantity-selector button {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #3498db;
+  background: white;
+  color: #3498db;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.quantity-selector button:hover:not(:disabled) {
+  background: #3498db;
+  color: white;
+}
+
+.quantity-selector button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quantity-selector span {
+  font-size: 1.3rem;
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-to-cart-btn:hover { 
+  background: #229954; 
+}
+
+@media (max-width: 768px) {
+  .modal-header { 
+    flex-direction: column; 
+  }
+  .modal-item-image { 
+    width: 100%; 
+    height: 200px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content { 
+    max-height: 100vh; 
+    border-radius: 0; 
+  }
+}

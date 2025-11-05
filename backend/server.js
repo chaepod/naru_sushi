@@ -134,6 +134,31 @@ app.get('/api/production-list', async (req, res) => {
   }
 });
 
+// GET /api/schools - Get all active schools
+app.get('/api/schools', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('schools')
+      .select('id, name, address')
+      .eq('active', true)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      count: data.length,
+      data: data
+    });
+  } catch (error) {
+    console.error('Error fetching schools:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -1,0 +1,47 @@
+.menu-page {
+    min-height: 100vh;
+    background: #f5f7fa;
+    padding: 2rem 0;
+}
+
+.menu-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.menu-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.menu-header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+}
+
+.menu-header p {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+}
+
+.error { color: #e74c3c; }
+
+@media (max-width: 480px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
