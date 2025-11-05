@@ -5,7 +5,9 @@
       "Bash(npm install)",
       "Bash(timeout 30 cmd:*)",
       "Bash(cat:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []
