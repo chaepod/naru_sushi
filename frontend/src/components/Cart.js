@@ -49,13 +49,38 @@ function Cart() {
                 />
                 <div className="cart-item-details">
                   <h3>{item.menuItem.name}</h3>
-                  <p className="cart-item-student">
-                    For: {item.studentName} ({item.roomNumber})
-                  </p>
-                  <p className="cart-item-school">{item.school}</p>
+
+                  {/* Order Summary Box */}
+                  <div className="cart-item-summary">
+                    <div className="summary-row">
+                      <span className="summary-label">For:</span>
+                      <span className="summary-value">{item.studentName}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Room:</span>
+                      <span className="summary-value">{item.roomNumber}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">School:</span>
+                      <span className="summary-value">{item.school}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Delivery Date:</span>
+                      <span className="summary-value">{item.deliveryDate ? new Date(item.deliveryDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'Not set'}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Rice Type:</span>
+                      <span className="summary-value">{item.riceType || 'White Rice'}</span>
+                    </div>
+                  </div>
+
                   {item.notes && (
-                    <p className="cart-item-notes">Note: {item.notes}</p>
+                    <div className="cart-item-notes-box">
+                      <span className="summary-label">📝 Notes:</span>
+                      <span className="summary-value">{item.notes}</span>
+                    </div>
                   )}
+
                   <div className="cart-item-footer">
                     <div className="cart-item-quantity">
                       <button
@@ -93,13 +118,13 @@ function Cart() {
               <span>Subtotal:</span>
               <span className="cart-total-price">{formatted}</span>
             </div>
-            <button 
+            <button
               className="checkout-btn"
               onClick={() => alert('Checkout coming in Week 4!')}
             >
               Proceed to Checkout
             </button>
-            <button 
+            <button
               className="clear-cart-btn"
               onClick={clearCart}
             >

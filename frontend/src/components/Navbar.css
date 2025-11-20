@@ -45,7 +45,16 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 768px) {
-  .navbar-links { gap: 1rem; }
-  .nav-link { font-size: 0.9rem; }
+/* Hide desktop navbar on mobile (below 768px) */
+@media (max-width: 767px) {
+  .navbar {
+    display: none;
+  }
+}
+
+/* Desktop navbar adjustments */
+@media (min-width: 768px) {
+  .navbar {
+    display: block;
+  }
 }

@@ -10,10 +10,15 @@
     align-items: center;
     gap: 0.5rem;
     transition: all 0.3s;
+    font-size: 1.2rem;
 }
 
 .cart-icon-button:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.cart-icon {
+    line-height: 1;
 }
 
 .cart-badge {

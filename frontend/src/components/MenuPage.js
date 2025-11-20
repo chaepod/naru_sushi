@@ -56,22 +56,49 @@ function MenuPage() {
     );
   }
 
+  // Group menu items by category
+  const groupedItems = menuItems.reduce((acc, item) => {
+    const category = item.category || 'Other';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {});
+
+  // Define category order
+  const categoryOrder = ['On Rice', 'Maki', 'Nigiri', 'Sashimi', 'Platters', 'Other'];
+  const sortedCategories = Object.keys(groupedItems).sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
   return (
     <div className="menu-page">
       <div className="menu-container">
         <header className="menu-header">
           <h1>Our Menu</h1>
           <p>Fresh, delicious Japanese cuisine for school lunches</p>
+          <p className="menu-disclaimer">Orders placed on the day are cut off by 9am each day.</p>
         </header>
-        <div className="menu-grid">
-          {menuItems.map(item => (
-            <MenuItemCard
-              key={item.id}
-              item={item}
-              onAddClick={handleAddClick}
-            />
-          ))}
-        </div>
+
+        {sortedCategories.map(category => (
+          <div key={category} className="menu-category">
+            <h2 className="category-title">{category}</h2>
+            <div className="menu-grid">
+              {groupedItems[category].map(item => (
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  onAddClick={handleAddClick}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
       {isModalOpen && (
         <OrderModal

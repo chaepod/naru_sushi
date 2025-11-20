@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import CartIcon from './CartIcon';
+import './MobileMenu.css';
 
 export default function MobileMenu({ menuItems }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,18 +44,24 @@ export default function MobileMenu({ menuItems }) {
 
   return (
     <>
-      {/* Hamburger Button - Only visible on mobile */}
-      <button
-        onClick={toggleMenu}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-lg hover:bg-gray-100 transition-colors"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? (
-          <HiX className="w-6 h-6 text-gray-800" />
-        ) : (
-          <HiMenu className="w-6 h-6 text-gray-800" />
-        )}
-      </button>
+      {/* Mobile Header Bar - Only visible below 768px */}
+      <div className="mobile-header">
+        <button
+          onClick={toggleMenu}
+          className="mobile-menu-button"
+          aria-label="Toggle menu"
+        >
+          {isOpen ? (
+            <HiX style={{ width: '24px', height: '24px' }} />
+          ) : (
+            <HiMenu style={{ width: '24px', height: '24px' }} />
+          )}
+        </button>
+
+        <div className="mobile-cart">
+          <CartIcon />
+        </div>
+      </div>
 
       <AnimatePresence>
         {isOpen && (
@@ -65,7 +73,7 @@ export default function MobileMenu({ menuItems }) {
               exit="closed"
               variants={overlayVariants}
               onClick={toggleMenu}
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+              className="mobile-menu-overlay"
             />
 
             {/* Slide-in Menu */}
@@ -74,23 +82,23 @@ export default function MobileMenu({ menuItems }) {
               animate="open"
               exit="closed"
               variants={menuVariants}
-              className="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl z-40 lg:hidden overflow-y-auto"
+              className="mobile-menu-panel"
             >
-              <div className="p-6 pt-16">
+              <div className="mobile-menu-content">
                 {/* Logo/Brand */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-800">Naru Sushi</h2>
-                  <p className="text-sm text-gray-600">Fresh & Delicious</p>
+                <div className="mobile-menu-header">
+                  <h2 className="mobile-menu-title">🍱 Naru Sushi</h2>
+                  <p className="mobile-menu-subtitle">Fresh & Delicious</p>
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="space-y-4">
+                <nav className="mobile-menu-nav">
                   {menuItems.map((item, index) => (
                     <Link
                       key={index}
                       to={item.href}
                       onClick={toggleMenu}
-                      className="block py-3 px-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg font-medium"
+                      className="mobile-menu-link"
                     >
                       {item.label}
                     </Link>

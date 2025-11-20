@@ -50,8 +50,15 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-.main-content { 
-  flex: 1; 
+.main-content {
+  flex: 1;
+}
+
+/* Add padding for mobile header on mobile screens */
+@media (max-width: 767px) {
+  .main-content {
+    padding-top: 60px;
+  }
 }
 
 ::-webkit-scrollbar { 
