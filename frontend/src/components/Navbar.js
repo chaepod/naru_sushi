@@ -6,10 +6,9 @@ import "./Navbar.css";
 
 function Navbar() {
   const menuItems = [
-    { label: "Home", href: "/" },
-    { label: "Menu", href: "/menu" },
+    { label: "Menu", href: "/" },
     { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
+    { label: "FAQ", href: "/faq" },
     { label: "Admin", href: "/admin" },
   ];
 

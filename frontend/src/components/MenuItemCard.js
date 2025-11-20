@@ -5,9 +5,10 @@ function MenuItemCard({ item, onAddClick }) {
   return (
     <div className="menu-item-card">
       <div className="menu-item-image">
-        <img 
-          src={item.image_url || '/images/placeholder.jpg'} 
+        <img
+          src={item.image_url || '/images/placeholder.jpg'}
           alt={item.name}
+          loading="lazy"
           onError={(e) => e.target.src = '/images/placeholder.jpg'}
         />
       </div>

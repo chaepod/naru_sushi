@@ -71,9 +71,10 @@ function OrderModal({ item, onClose }) {
         <button className="modal-close" onClick={onClose}>×</button>
         
         <div className="modal-header">
-          <img 
-            src={item.image_url || '/images/placeholder.jpg'} 
+          <img
+            src={item.image_url || '/images/placeholder.jpg'}
             alt={item.name}
+            loading="lazy"
             className="modal-item-image"
           />
           <div className="modal-item-info">
