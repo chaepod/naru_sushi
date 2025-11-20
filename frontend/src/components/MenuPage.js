@@ -82,6 +82,7 @@ function MenuPage() {
         <header className="menu-header">
           <h1>Our Menu</h1>
           <p>Fresh, delicious Japanese cuisine for school lunches</p>
+          <p className="menu-disclaimer">Orders placed on the day are cut off by 9am each day.</p>
         </header>
 
         {sortedCategories.map(category => (

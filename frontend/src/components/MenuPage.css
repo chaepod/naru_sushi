@@ -25,6 +25,13 @@
     color: #7f8c8d;
 }
 
+.menu-disclaimer {
+    font-size: 0.95rem;
+    color: #e74c3c;
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
 .menu-category {
     margin-bottom: 3rem;
 }

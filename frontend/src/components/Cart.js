@@ -41,20 +41,45 @@ function Cart() {
           ) : (
             cart.map(item => (
               <div key={item.cartId} className="cart-item">
-                <img 
+                <img
                   src={item.menuItem.image_url || '/images/placeholder.jpg'}
                   alt={item.menuItem.name}
                   className="cart-item-image"
                 />
                 <div className="cart-item-details">
                   <h3>{item.menuItem.name}</h3>
-                  <p className="cart-item-student">
-                    For: {item.studentName} ({item.roomNumber})
-                  </p>
-                  <p className="cart-item-school">{item.school}</p>
+
+                  {/* Order Summary Box */}
+                  <div className="cart-item-summary">
+                    <div className="summary-row">
+                      <span className="summary-label">For:</span>
+                      <span className="summary-value">{item.studentName}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Room:</span>
+                      <span className="summary-value">{item.roomNumber}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">School:</span>
+                      <span className="summary-value">{item.school}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Delivery Date:</span>
+                      <span className="summary-value">{item.deliveryDate ? new Date(item.deliveryDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'Not set'}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Rice Type:</span>
+                      <span className="summary-value">{item.riceType || 'White Rice'}</span>
+                    </div>
+                  </div>
+
                   {item.notes && (
-                    <p className="cart-item-notes">Note: {item.notes}</p>
+                    <div className="cart-item-notes-box">
+                      <span className="summary-label">📝 Notes:</span>
+                      <span className="summary-value">{item.notes}</span>
+                    </div>
                   )}
+
                   <div className="cart-item-footer">
                     <div className="cart-item-quantity">
                       <button
@@ -87,54 +112,24 @@ function Cart() {
         </div>
 
         {cart.length > 0 && (
-          <>
-            <div className="order-summary">
-              <h3>Order Summary</h3>
-              <div className="order-summary-details">
-                <div className="summary-item">
-                  <span className="summary-label">Rice Type:</span>
-                  <span className="summary-value">{cart[0]?.riceType || 'White Rice'}</span>
-                </div>
-                <div className="summary-item">
-                  <span className="summary-label">School:</span>
-                  <span className="summary-value">{cart[0]?.school}</span>
-                </div>
-                <div className="summary-item">
-                  <span className="summary-label">Student:</span>
-                  <span className="summary-value">{cart[0]?.studentName}</span>
-                </div>
-                <div className="summary-item">
-                  <span className="summary-label">Room:</span>
-                  <span className="summary-value">{cart[0]?.roomNumber}</span>
-                </div>
-                {cart[0]?.notes && (
-                  <div className="summary-notes">
-                    <span className="summary-label">Notes:</span>
-                    <p className="summary-notes-text">{cart[0].notes}</p>
-                  </div>
-                )}
-              </div>
+          <div className="cart-footer">
+            <div className="cart-total">
+              <span>Subtotal:</span>
+              <span className="cart-total-price">{formatted}</span>
             </div>
-
-            <div className="cart-footer">
-              <div className="cart-total">
-                <span>Subtotal:</span>
-                <span className="cart-total-price">{formatted}</span>
-              </div>
-              <button
-                className="checkout-btn"
-                onClick={() => alert('Checkout coming in Week 4!')}
-              >
-                Proceed to Checkout
-              </button>
-              <button
-                className="clear-cart-btn"
-                onClick={clearCart}
-              >
-                Clear Cart
-              </button>
-            </div>
-          </>
+            <button
+              className="checkout-btn"
+              onClick={() => alert('Checkout coming in Week 4!')}
+            >
+              Proceed to Checkout
+            </button>
+            <button
+              className="clear-cart-btn"
+              onClick={clearCart}
+            >
+              Clear Cart
+            </button>
+          </div>
         )}
       </div>
     </>
