@@ -67,7 +67,7 @@ function MenuPage() {
   }, {});
 
   // Define category order
-  const categoryOrder = ['On Rice', 'Maki', 'Nigiri', 'Sashimi', 'Other'];
+  const categoryOrder = ['On Rice', 'Maki', 'Nigiri', 'Sashimi', 'Platters', 'Other'];
   const sortedCategories = Object.keys(groupedItems).sort((a, b) => {
     const indexA = categoryOrder.indexOf(a);
     const indexB = categoryOrder.indexOf(b);
