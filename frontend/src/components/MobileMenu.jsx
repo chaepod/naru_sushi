@@ -5,10 +5,15 @@ import { Link } from 'react-router-dom';
 import CartIcon from './CartIcon';
 import './MobileMenu.css';
 
-export default function MobileMenu({ menuItems }) {
+export default function MobileMenu({ menuItems, isAuthenticated, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  const handleLogout = () => {
+    toggleMenu();
+    onLogout();
+  };
 
   const menuVariants = {
     closed: {
@@ -103,6 +108,14 @@ export default function MobileMenu({ menuItems }) {
                       {item.label}
                     </Link>
                   ))}
+                  {isAuthenticated && (
+                    <button
+                      onClick={handleLogout}
+                      className="mobile-menu-link mobile-logout-btn"
+                    >
+                      Logout
+                    </button>
+                  )}
                 </nav>
               </div>
             </motion.div>
