@@ -41,9 +41,10 @@ function Cart() {
           ) : (
             cart.map(item => (
               <div key={item.cartId} className="cart-item">
-                <img 
+                <img
                   src={item.menuItem.image_url || '/images/placeholder.jpg'}
                   alt={item.menuItem.name}
+                  loading="lazy"
                   className="cart-item-image"
                 />
                 <div className="cart-item-details">
