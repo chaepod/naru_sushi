@@ -14,7 +14,8 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(taskkill /PID 38084 /F)",
-      "Bash(npx kill-port:*)"
+      "Bash(npx kill-port:*)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []
