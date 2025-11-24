@@ -4,8 +4,7 @@
 node_modules/
 
 # Production
-frontend/build/
-backend/dist/
+build/
 
 # Environment
 .Environment

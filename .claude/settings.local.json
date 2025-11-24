@@ -10,7 +10,10 @@
       "Bash(npm run:*)",
       "Bash(npm install:*)",
       "Bash(npx tailwindcss init)",
-      "Bash(timeout 15 cmd:*)"
+      "Bash(timeout 15 cmd:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rm:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
