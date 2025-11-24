@@ -159,6 +159,241 @@ app.get('/api/schools', async (req, res) => {
   }
 });
 
+// Initialize Stripe (add this after Supabase initialization, around line 14)
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// POST /api/create-payment-intent - Create Stripe payment intent
+app.post('/api/create-payment-intent', async (req, res) => {
+  try {
+    const { amount, metadata } = req.body;
+
+    // Validate amount
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid amount'
+      });
+    }
+
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Convert to cents
+      currency: 'nzd', // New Zealand Dollars
+      metadata: metadata || {},
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    });
+  } catch (error) {
+    console.error('Error creating payment intent:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// POST /api/orders - Create new order
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { cart, customerInfo, paymentIntentId, totalAmount } = req.body;
+
+    // Validate required fields
+    if (!cart || !cart.length || !customerInfo || !paymentIntentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields'
+      });
+    }
+
+    // Generate unique order number
+    const orderNumber = `NS${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
+    // Group cart items by delivery date and student
+    const orderGroups = {};
+    
+    cart.forEach(item => {
+      const key = `${item.deliveryDate}-${item.studentName}-${item.school}-${item.roomNumber}`;
+      if (!orderGroups[key]) {
+        orderGroups[key] = {
+          deliveryDate: item.deliveryDate,
+          studentName: item.studentName,
+          school: item.school,
+          roomNumber: item.roomNumber,
+          items: []
+        };
+      }
+      orderGroups[key].items.push(item);
+    });
+
+    // Create orders for each group
+    const createdOrders = [];
+    
+    for (const [key, group] of Object.entries(orderGroups)) {
+      // Calculate subtotal for this order
+      const orderTotal = group.items.reduce((sum, item) => sum + item.totalPrice, 0);
+
+      // Insert order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          student_name: group.studentName,
+          room: group.roomNumber,
+          school: group.school,
+          date: group.deliveryDate,
+          delivery_date: group.deliveryDate,
+          parent_name: customerInfo.parentName,
+          parent_email: customerInfo.parentEmail,
+          phone: customerInfo.phone,
+          total_amount: orderTotal,
+          payment_status: 'pending',
+          payment_intent_id: paymentIntentId,
+          status: 'pending',
+          order_number: orderNumber,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Insert order items
+      const orderItems = group.items.map(item => ({
+        order_id: order.id,
+        item_name: item.menuItem.name,
+        quantity: item.quantity,
+        menu_item_id: item.menuItem.id,
+        unit_price: item.menuItem.price,
+        subtotal: item.totalPrice,
+        rice_type: item.riceType,
+        special_notes: item.notes,
+        delivery_date: item.deliveryDate,
+        customizations: [item.riceType, item.notes].filter(Boolean)
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      createdOrders.push(order);
+    }
+
+    res.json({
+      success: true,
+      orderNumber: orderNumber,
+      orders: createdOrders,
+      totalAmount: totalAmount
+    });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// GET /api/orders/:orderNumber - Get order by order number
+app.get('/api/orders/:orderNumber', async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+
+    const { data: orders, error: ordersError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('order_number', orderNumber);
+
+    if (ordersError) throw ordersError;
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found'
+      });
+    }
+
+    // Fetch items for each order
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const { data: items, error: itemsError } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', order.id);
+
+        if (itemsError) throw itemsError;
+
+        return {
+          ...order,
+          items: items
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: ordersWithItems
+    });
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// POST /api/webhook - Stripe webhook handler
+app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+
+    // Update order payment status
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        payment_status: 'paid',
+        status: 'confirmed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('payment_intent_id', paymentIntent.id);
+
+    if (error) {
+      console.error('Error updating order status:', error);
+      return res.status(500).json({ error: 'Failed to update order' });
+    }
+
+    console.log(`Payment succeeded for PaymentIntent: ${paymentIntent.id}`);
+    
+    // TODO: Send confirmation email here
+  }
+
+  res.json({ received: true });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
