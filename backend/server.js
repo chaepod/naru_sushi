@@ -42,13 +42,26 @@ app.get('/api/orders', async (req, res) => {
 
         return {
           id: order.id,
+          orderNumber: order.order_number,
           studentName: order.student_name,
           room: order.room,
           school: order.school,
           date: order.date,
+          deliveryDate: order.delivery_date,
+          parentName: order.parent_name,
+          parentEmail: order.parent_email,
+          phone: order.phone,
+          totalAmount: order.total_amount,
+          status: order.status,
+          paymentStatus: order.payment_status,
+          createdAt: order.created_at,
           items: items.map(item => ({
             name: item.item_name,
             quantity: item.quantity,
+            unitPrice: item.unit_price,
+            subtotal: item.subtotal,
+            riceType: item.rice_type,
+            specialNotes: item.special_notes,
             customizations: item.customizations || []
           }))
         };

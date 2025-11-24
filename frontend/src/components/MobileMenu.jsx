@@ -63,6 +63,10 @@ export default function MobileMenu({ menuItems, isAuthenticated, onLogout }) {
           )}
         </button>
 
+        <div className="mobile-brand">
+          🍱 Naru Sushi
+        </div>
+
         <div className="mobile-cart">
           <CartIcon />
         </div>
@@ -89,6 +93,15 @@ export default function MobileMenu({ menuItems, isAuthenticated, onLogout }) {
               variants={menuVariants}
               className="mobile-menu-panel"
             >
+              {/* Close button inside the menu */}
+              <button
+                onClick={toggleMenu}
+                className="mobile-menu-close-btn"
+                aria-label="Close menu"
+              >
+                <HiX style={{ width: '28px', height: '28px' }} />
+              </button>
+
               <div className="mobile-menu-content">
                 {/* Logo/Brand */}
                 <div className="mobile-menu-header">
@@ -108,16 +121,18 @@ export default function MobileMenu({ menuItems, isAuthenticated, onLogout }) {
                       {item.label}
                     </Link>
                   ))}
-                  {isAuthenticated && (
-                    <button
-                      onClick={handleLogout}
-                      className="mobile-menu-link mobile-logout-btn"
-                    >
-                      Logout
-                    </button>
-                  )}
                 </nav>
               </div>
+
+              {/* Sticky Logout Button */}
+              {isAuthenticated && (
+                <button
+                  onClick={handleLogout}
+                  className="mobile-logout-btn-sticky"
+                >
+                  Logout
+                </button>
+              )}
             </motion.div>
           </>
         )}

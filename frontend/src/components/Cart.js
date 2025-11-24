@@ -1,18 +1,20 @@
-import React from 'react';
-import { useCart } from '../hooks/useCart';
-import { formatPrice, calculateCartTotals } from '../utils/cartHelpers';
-import './Cart.css';
+import React from "react";
+import { useCart } from "../hooks/useCart";
+import { formatPrice, calculateCartTotals } from "../utils/cartHelpers";
+import { useNavigate } from "react-router-dom";
+import "./Cart.css";
 
 function Cart() {
-  const { 
-    cart, 
-    isCartOpen, 
-    toggleCart, 
-    removeFromCart, 
-    updateQuantity, 
-    clearCart 
+  const navigate = useNavigate();
+  const {
+    cart,
+    isCartOpen,
+    toggleCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
   } = useCart();
-  
+
   const { formatted, itemCount } = calculateCartTotals(cart);
 
   if (!isCartOpen) return null;
@@ -27,7 +29,9 @@ function Cart() {
       <div className="cart-sidebar">
         <div className="cart-header">
           <h2>Shopping Cart ({itemCount})</h2>
-          <button className="cart-close-btn" onClick={toggleCart}>×</button>
+          <button className="cart-close-btn" onClick={toggleCart}>
+            ×
+          </button>
         </div>
 
         <div className="cart-items">
@@ -39,10 +43,10 @@ function Cart() {
               </button>
             </div>
           ) : (
-            cart.map(item => (
+            cart.map((item) => (
               <div key={item.cartId} className="cart-item">
                 <img
-                  src={item.menuItem.image_url || '/images/placeholder.jpg'}
+                  src={item.menuItem.image_url || "/images/placeholder.jpg"}
                   alt={item.menuItem.name}
                   loading="lazy"
                   className="cart-item-image"
@@ -65,12 +69,10 @@ function Cart() {
                       <span className="summary-value">{item.school}</span>
                     </div>
                     <div className="summary-row">
-                      <span className="summary-label">Delivery Date:</span>
-                      <span className="summary-value">{item.deliveryDate ? new Date(item.deliveryDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'Not set'}</span>
-                    </div>
-                    <div className="summary-row">
                       <span className="summary-label">Rice Type:</span>
-                      <span className="summary-value">{item.riceType || 'White Rice'}</span>
+                      <span className="summary-value">
+                        {item.riceType || "White Rice"}
+                      </span>
                     </div>
                   </div>
 
@@ -84,14 +86,18 @@ function Cart() {
                   <div className="cart-item-footer">
                     <div className="cart-item-quantity">
                       <button
-                        onClick={() => handleQuantityChange(item.cartId, item.quantity, -1)}
+                        onClick={() =>
+                          handleQuantityChange(item.cartId, item.quantity, -1)
+                        }
                         disabled={item.quantity <= 1}
                       >
                         -
                       </button>
                       <span>{item.quantity}</span>
                       <button
-                        onClick={() => handleQuantityChange(item.cartId, item.quantity, 1)}
+                        onClick={() =>
+                          handleQuantityChange(item.cartId, item.quantity, 1)
+                        }
                       >
                         +
                       </button>
@@ -120,14 +126,14 @@ function Cart() {
             </div>
             <button
               className="checkout-btn"
-              onClick={() => alert('Checkout coming in Week 4!')}
+              onClick={() => {
+                toggleCart();
+                navigate("/checkout");
+              }}
             >
               Proceed to Checkout
             </button>
-            <button
-              className="clear-cart-btn"
-              onClick={clearCart}
-            >
+            <button className="clear-cart-btn" onClick={clearCart}>
               Clear Cart
             </button>
           </div>

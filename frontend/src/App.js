@@ -14,6 +14,10 @@ const FAQPage = lazy(() => import("./components/FAQPage"));
 const OrderList = lazy(() => import("./components/OrderList"));
 const LoginPage = lazy(() => import("./components/LoginPage"));
 
+// Add to the lazy loading imports:
+const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
+const OrderConfirmation = lazy(() => import("./components/OrderConfirmation"));
+
 // Loading component
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -42,6 +46,11 @@ function App() {
                         <OrderList />
                       </ProtectedRoute>
                     }
+                  />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route
+                    path="/order-confirmation/:orderNumber"
+                    element={<OrderConfirmation />}
                   />
                 </Routes>
               </Suspense>

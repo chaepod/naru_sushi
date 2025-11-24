@@ -141,6 +141,47 @@
   color: #666;
 }
 
+.form-group .input-error {
+  border-color: #e74c3c;
+}
+
+.form-group .error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.date-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.date-input-wrapper input[type="date"] {
+  flex: 1;
+}
+
+.date-picker-btn {
+  padding: 0.75rem 1rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.date-picker-btn:hover {
+  background: #c0392b;
+}
+
+.date-picker-btn:active {
+  background: #a93226;
+}
+
 /* Payment Section */
 .payment-section {
   margin-top: 2rem;
@@ -212,5 +253,31 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+  }
+
+  /* Ensure date input is fully accessible on mobile */
+  .form-group input[type="date"] {
+    position: relative;
+    padding: 0.75rem;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    min-height: 48px; /* Better touch target */
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  }
+
+  /* Make calendar icon larger and more tappable on mobile */
+  .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    padding: 0.5rem;
+    margin: -0.5rem;
+    opacity: 1;
+  }
+
+  /* Ensure the input is tappable */
+  .delivery-info-section {
+    -webkit-user-select: none;
+    user-select: none;
   }
 }

@@ -4,7 +4,7 @@ import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { useCart } from '../hooks/useCart';
 import './CheckoutForm.css';
 
-const CheckoutForm = ({ clientSecret, paymentIntentId, customerInfo, totalAmount }) => {
+const CheckoutForm = ({ clientSecret, paymentIntentId, customerInfo, totalAmount, deliveryDate }) => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -40,15 +40,21 @@ const CheckoutForm = ({ clientSecret, paymentIntentId, customerInfo, totalAmount
       }
 
       if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Create order in database
+        // Create order in database with delivery date added to each cart item
+        const cartWithDeliveryDate = cart.map(item => ({
+          ...item,
+          deliveryDate: deliveryDate
+        }));
+
         const orderResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            cart: cart,
+            cart: cartWithDeliveryDate,
             customerInfo: customerInfo,
             paymentIntentId: paymentIntentId,
-            totalAmount: totalAmount
+            totalAmount: totalAmount,
+            deliveryDate: deliveryDate
           })
         });
 

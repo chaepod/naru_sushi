@@ -43,7 +43,7 @@ const OrderConfirmation = () => {
       <div className="confirmation-page">
         <div className="error">
           <h2>Order Not Found</h2>
-          <button onClick={() => navigate('/menu')}>Return to Menu</button>
+          <button onClick={() => navigate('/')}>Return to Menu</button>
         </div>
       </div>
     );
@@ -84,7 +84,7 @@ const OrderConfirmation = () => {
         </div>
 
         <div className="action-buttons">
-          <button onClick={() => navigate('/menu')} className="primary-btn">
+          <button onClick={() => navigate('/')} className="primary-btn">
             Order More
           </button>
           <button onClick={() => window.print()} className="secondary-btn">

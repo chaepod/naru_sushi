@@ -11,6 +11,7 @@ function MenuPage() {
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
     fetchMenuItems();
@@ -76,29 +77,46 @@ function MenuPage() {
     return indexA - indexB;
   });
 
+  // Set initial category if not set
+  if (sortedCategories.length > 0 && !selectedCategory) {
+    setSelectedCategory(sortedCategories[0]);
+  }
+
   return (
     <div className="menu-page">
       <div className="menu-container">
         <header className="menu-header">
-          <h1>Our Menu</h1>
-          <p>Fresh, delicious Japanese cuisine for school lunches</p>
+          <p className="menu-tagline">Fresh, delicious Japanese cuisine for school lunches</p>
           <p className="menu-disclaimer">Orders placed on the day are cut off by 9am each day.</p>
         </header>
 
-        {sortedCategories.map(category => (
-          <div key={category} className="menu-category">
-            <h2 className="category-title">{category}</h2>
-            <div className="menu-grid">
-              {groupedItems[category].map(item => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  onAddClick={handleAddClick}
-                />
-              ))}
-            </div>
+        {/* Horizontal Scrolling Categories */}
+        <div className="category-scroll-container">
+          <div className="category-scroll">
+            {sortedCategories.map(category => (
+              <button
+                key={category}
+                className={`category-chip ${selectedCategory === category ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Menu Items Grid */}
+        {selectedCategory && groupedItems[selectedCategory] && (
+          <div className="menu-grid">
+            {groupedItems[selectedCategory].map(item => (
+              <MenuItemCard
+                key={item.id}
+                item={item}
+                onAddClick={handleAddClick}
+              />
+            ))}
+          </div>
+        )}
       </div>
       {isModalOpen && (
         <OrderModal

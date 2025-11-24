@@ -7,7 +7,6 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 function OrderModal({ item, onClose }) {
   const [quantity, setQuantity] = useState(1);
   const [riceType, setRiceType] = useState('White Rice');
-  const [deliveryDate, setDeliveryDate] = useState('');
   const [school, setSchool] = useState('');
   const [studentName, setStudentName] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
@@ -43,7 +42,6 @@ function OrderModal({ item, onClose }) {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!deliveryDate) newErrors.deliveryDate = 'Please select a delivery date';
     if (!school) newErrors.school = 'Please select a school';
     if (!studentName.trim()) newErrors.studentName = 'Student name is required';
     if (!roomNumber.trim()) newErrors.roomNumber = 'Room number is required';
@@ -58,7 +56,6 @@ function OrderModal({ item, onClose }) {
       menuItem: item,
       quantity,
       riceType,
-      deliveryDate,
       school,
       studentName,
       roomNumber,
@@ -121,21 +118,6 @@ function OrderModal({ item, onClose }) {
               <option value="Brown Rice">Brown Rice</option>
               <option value="Sushi Rice">Sushi Rice</option>
             </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="deliveryDate">Delivery Date *</label>
-            <input
-              type="date"
-              id="deliveryDate"
-              value={deliveryDate}
-              onChange={(e) => setDeliveryDate(e.target.value)}
-              className={errors.deliveryDate ? 'input-error' : ''}
-              min={new Date().toISOString().split('T')[0]}
-            />
-            {errors.deliveryDate && (
-              <span className="error-message">{errors.deliveryDate}</span>
-            )}
           </div>
 
           <div className="form-group">
