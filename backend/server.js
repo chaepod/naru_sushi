@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -14,6 +15,7 @@ const supabase = createClient(
 );
 
 // Middleware
+app.use(compression()); // Enable gzip compression for faster data transfer
 app.use(cors());
 app.use(express.json());
 
@@ -105,6 +107,9 @@ app.get('/api/orders', async (req, res) => {
 // GET /api/menu - Get all menu items
 app.get('/api/menu', async (req, res) => {
   try {
+    // Cache for 10 minutes (600 seconds) - menu doesn't change often
+    res.set('Cache-Control', 'public, max-age=600, s-maxage=600');
+
     const { data, error } = await supabase
       .from('menu_items')
       .select('*')
@@ -170,6 +175,9 @@ app.get('/api/production-list', async (req, res) => {
 // GET /api/schools - Get all active schools
 app.get('/api/schools', async (req, res) => {
   try {
+    // Cache for 30 minutes (1800 seconds) - schools rarely change
+    res.set('Cache-Control', 'public, max-age=1800, s-maxage=1800');
+
     const { data, error } = await supabase
       .from('schools')
       .select('id, name, address')
@@ -431,6 +439,9 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Start keep-alive service to prevent Render cold starts
+require('./keep-alive');
 
 // Start server
 app.listen(PORT, () => {
