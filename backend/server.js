@@ -55,15 +55,35 @@ app.get('/api/orders', async (req, res) => {
           status: order.status,
           paymentStatus: order.payment_status,
           createdAt: order.created_at,
-          items: items.map(item => ({
-            name: item.item_name,
-            quantity: item.quantity,
-            unitPrice: item.unit_price,
-            subtotal: item.subtotal,
-            riceType: item.rice_type,
-            specialNotes: item.special_notes,
-            customizations: item.customizations || []
-          }))
+          items: items.map(item => {
+            // For backward compatibility, if customizations array exists and has items,
+            // extract rice type and special notes from it
+            const customizations = item.customizations || [];
+            let riceType = item.rice_type;
+            let specialNotes = item.special_notes;
+
+            // If we have customizations but no rice_type/special_notes, parse them
+            if (customizations.length > 0 && !specialNotes) {
+              // First item is usually rice type
+              if (customizations[0]) {
+                riceType = riceType || customizations[0];
+              }
+              // Remaining items are special notes
+              if (customizations.length > 1) {
+                specialNotes = customizations.slice(1).join('\n');
+              }
+            }
+
+            return {
+              name: item.item_name,
+              quantity: item.quantity,
+              unitPrice: item.unit_price,
+              subtotal: item.subtotal,
+              riceType: riceType,
+              specialNotes: specialNotes,
+              customizations: customizations
+            };
+          })
         };
       })
     );
