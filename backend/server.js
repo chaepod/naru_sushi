@@ -14,9 +14,105 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+// Initialize Stripe
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 // Middleware
 app.use(compression()); // Enable gzip compression for faster data transfer
 app.use(cors());
+
+// IMPORTANT: Stripe webhook route must be defined BEFORE express.json() middleware
+// to receive raw body for signature verification
+app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+
+    // Update order payment status
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        payment_status: 'paid',
+        status: 'confirmed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('payment_intent_id', paymentIntent.id);
+
+    if (error) {
+      console.error('Error updating order status:', error);
+      return res.status(500).json({ error: 'Failed to update order' });
+    }
+
+    console.log(`Payment succeeded for PaymentIntent: ${paymentIntent.id}`);
+
+    // Fetch order details and send confirmation email
+    try {
+      const { data: orders, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('payment_intent_id', paymentIntent.id);
+
+      if (orderError) {
+        console.error('Error fetching order for email:', orderError);
+      } else if (orders && orders.length > 0) {
+        // Fetch order items for the first order
+        const order = orders[0];
+        const { data: items, error: itemsError } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', order.id);
+
+        if (itemsError) {
+          console.error('Error fetching order items:', itemsError);
+        } else {
+          // Import email service dynamically to avoid issues if not configured
+          const { sendOrderConfirmation } = require('./services/emailService');
+          await sendOrderConfirmation(order, items || []);
+        }
+      }
+    } catch (emailError) {
+      console.error('Error sending confirmation email:', emailError);
+      // Don't fail the webhook if email fails
+    }
+  } else if (event.type === 'payment_intent.payment_failed') {
+    const paymentIntent = event.data.object;
+
+    console.log(`Payment failed for PaymentIntent: ${paymentIntent.id}`);
+
+    // Optionally send payment failure email
+    try {
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('payment_intent_id', paymentIntent.id);
+
+      if (orders && orders.length > 0) {
+        const { sendPaymentFailureEmail } = require('./services/emailService');
+        await sendPaymentFailureEmail(orders[0]);
+      }
+    } catch (emailError) {
+      console.error('Error sending payment failure email:', emailError);
+    }
+  }
+
+  res.json({ received: true });
+});
+
+// Apply JSON parsing middleware to all other routes
 app.use(express.json());
 
 // Routes
@@ -199,9 +295,6 @@ app.get('/api/schools', async (req, res) => {
     });
   }
 });
-
-// Initialize Stripe (add this after Supabase initialization, around line 14)
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // POST /api/create-payment-intent - Create Stripe payment intent
 app.post('/api/create-payment-intent', async (req, res) => {
@@ -390,49 +483,6 @@ app.get('/api/orders/:orderNumber', async (req, res) => {
       error: error.message
     });
   }
-});
-
-// POST /api/webhook - Stripe webhook handler
-app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  // Handle the event
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object;
-
-    // Update order payment status
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        payment_status: 'paid',
-        status: 'confirmed',
-        updated_at: new Date().toISOString()
-      })
-      .eq('payment_intent_id', paymentIntent.id);
-
-    if (error) {
-      console.error('Error updating order status:', error);
-      return res.status(500).json({ error: 'Failed to update order' });
-    }
-
-    console.log(`Payment succeeded for PaymentIntent: ${paymentIntent.id}`);
-    
-    // TODO: Send confirmation email here
-  }
-
-  res.json({ received: true });
 });
 
 // Health check endpoint
