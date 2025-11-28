@@ -17,6 +17,15 @@ function OrderModal({ item, onClose }) {
 
   useEffect(() => {
     fetchSchools();
+    // Load cached values from localStorage
+    const cachedStudentName = localStorage.getItem('lastStudentName') || '';
+    const cachedRoomNumber = localStorage.getItem('lastRoomNumber') || '';
+    const cachedSchool = localStorage.getItem('lastSchool') || '';
+
+    setStudentName(cachedStudentName);
+    setRoomNumber(cachedRoomNumber);
+    setSchool(cachedSchool);
+
     const handleEscape = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handleEscape);
     document.body.style.overflow = 'hidden';
@@ -51,6 +60,11 @@ function OrderModal({ item, onClose }) {
 
   const handleAddToCart = () => {
     if (!validateForm()) return;
+
+    // Cache the values to localStorage
+    localStorage.setItem('lastStudentName', studentName);
+    localStorage.setItem('lastRoomNumber', roomNumber);
+    localStorage.setItem('lastSchool', school);
 
     addToCart({
       menuItem: item,
@@ -116,7 +130,6 @@ function OrderModal({ item, onClose }) {
             >
               <option value="White Rice">White Rice</option>
               <option value="Brown Rice">Brown Rice</option>
-              <option value="Sushi Rice">Sushi Rice</option>
             </select>
           </div>
 
