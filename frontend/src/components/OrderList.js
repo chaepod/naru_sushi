@@ -16,7 +16,8 @@ function OrderList() {
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
   const [schools, setSchools] = useState([]);
   const [selectedSchool, setSelectedSchool] = useState('All Schools');
-  const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'production'
+  const [viewMode, setViewMode] = useState('production'); // 'production', 'labels', or 'cards'
+  const [lastFetchTime, setLastFetchTime] = useState(null);
 
   const formatDate = (dateValue, includeTime = false) => {
     if (!dateValue) return 'N/A';
@@ -79,6 +80,11 @@ function OrderList() {
     try {
       setLoading(true);
 
+      // Get last fetch time for selected date from localStorage
+      const dateKey = formatDateDDMMYYYY(selectedDate);
+      const storedTime = localStorage.getItem(`lastFetchTime_${dateKey}`);
+      const previousFetchTime = storedTime ? new Date(storedTime) : null;
+
       // Fetch orders, menu items, and schools
       const [ordersRes, menuRes, schoolsRes] = await Promise.all([
         fetch(`${API_URL}/api/orders`),
@@ -97,11 +103,23 @@ function OrderList() {
       setOrders(ordersData.data);
       setMenuItems(menuData.data);
       setSchools(schoolsData.data);
+
+      // Store current fetch time
+      const currentTime = new Date();
+      setLastFetchTime(previousFetchTime);
+      localStorage.setItem(`lastFetchTime_${dateKey}`, currentTime.toISOString());
+
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  const isNewOrder = (order) => {
+    if (!lastFetchTime) return false;
+    const orderCreatedTime = new Date(order.createdAt || order.date);
+    return orderCreatedTime > lastFetchTime;
   };
 
   useEffect(() => {
@@ -151,7 +169,16 @@ function OrderList() {
   };
 
   const handlePrint = () => {
-    window.print();
+    // Check if there are any orders to print
+    if (Object.keys(productionList).length === 0) {
+      alert('No orders to print for the selected date and school.');
+      return;
+    }
+
+    // Use setTimeout to avoid browser locker behavior issues
+    setTimeout(() => {
+      window.print();
+    }, 0);
   };
 
   // Get unique dates that have orders (filtered by selected school)
@@ -270,8 +297,21 @@ function OrderList() {
             name: item.name,
             quantity: 0,
             riceType,
-            notes
+            notes,
+            orderDateTime: order.createdAt || order.date,
+            isNew: isNewOrder(order)
           };
+        } else {
+          // Keep the earliest order date/time
+          const existingDateTime = new Date(productionMap[category][itemKey].orderDateTime);
+          const currentDateTime = new Date(order.createdAt || order.date);
+          if (currentDateTime < existingDateTime) {
+            productionMap[category][itemKey].orderDateTime = order.createdAt || order.date;
+          }
+          // Mark as new if any order contributing to this item is new
+          if (isNewOrder(order)) {
+            productionMap[category][itemKey].isNew = true;
+          }
         }
 
         productionMap[category][itemKey].quantity += item.quantity;
@@ -294,22 +334,15 @@ function OrderList() {
   return (
     <div className="order-list-container">
       <div className="orders-header">
-        <div className="header-left">
-          <h1>Order Management</h1>
-          <p className="orders-count">Total Orders: {orders.length}</p>
-        </div>
+        <h1>Order Management</h1>
+      </div>
+      <div className="view-toggle-wrapper">
         <div className="view-toggle">
           <button
             className={`toggle-btn ${viewMode === 'production' ? 'active' : ''}`}
             onClick={() => setViewMode('production')}
           >
-            All Orders
-          </button>
-          <button
-            className={`toggle-btn ${viewMode === 'cards' ? 'active' : ''}`}
-            onClick={() => setViewMode('cards')}
-          >
-            Schools
+            Orders
           </button>
           <button
             className={`toggle-btn ${viewMode === 'labels' ? 'active' : ''}`}
@@ -332,7 +365,7 @@ function OrderList() {
                 type="text"
                 id="date-display"
                 className="date-filter-input"
-                value={formatDateDDMMYYYY(selectedDate)}
+                value={`${formatDateDDMMYYYY(selectedDate)}${isToday(selectedDate) ? ' (TODAY)' : ''}`}
                 readOnly
                 onClick={toggleCalendar}
               />
@@ -384,7 +417,7 @@ function OrderList() {
                             <div
                               key={dayIndex}
                               className={`calendar-day ${!dayInfo ? 'empty' : ''} ${dayInfo?.isToday ? 'today' : ''} ${dayInfo?.isSelected ? 'selected' : ''} ${dayInfo?.hasOrders ? 'has-orders' : ''}`}
-                              onClick={() => dayInfo && handleDateSelect(dayInfo.date)}
+                              onClick={() => dayInfo && dayInfo.hasOrders && handleDateSelect(dayInfo.date)}
                             >
                               {dayInfo && (
                                 <span className="day-number">{dayInfo.day}</span>
@@ -428,6 +461,10 @@ function OrderList() {
 
       {/* Production List - Only visible when printing */}
       <div className="production-list-print">
+        <h2 className="production-view-header">ALL ORDERS</h2>
+        <div className="production-date-header">
+          Delivery Date: {formatDateDDMMYYYY(selectedDate)}
+        </div>
         {Object.keys(productionList).sort().map(category => (
           <div key={category} className="production-category">
             <h3 className="production-category-title">{category}</h3>
@@ -465,6 +502,9 @@ function OrderList() {
         <div className="production-list-view">
           {Object.keys(productionList).length > 0 ? (
             <>
+              <h2 className="production-view-header">
+                {selectedSchool === 'All Schools' ? 'All orders' : selectedSchool}
+              </h2>
               <div className="production-date-header">
                 Delivery Date: {formatDateDDMMYYYY(selectedDate)}
               </div>
@@ -474,6 +514,7 @@ function OrderList() {
                   <table className="production-view-table">
                     <thead>
                       <tr>
+                        <th>Order Date & Time</th>
                         <th>Quantity</th>
                         <th>Item</th>
                         <th>Rice Type</th>
@@ -482,9 +523,13 @@ function OrderList() {
                     </thead>
                     <tbody>
                       {Object.values(productionList[category])
-                        .sort((a, b) => b.quantity - a.quantity)
+                        .sort((a, b) => new Date(b.orderDateTime) - new Date(a.orderDateTime))
                         .map((item, index) => (
-                          <tr key={index}>
+                          <tr key={index} className={item.isNew ? 'new-order-row' : ''}>
+                            <td className="date-time-cell">
+                              {formatDate(item.orderDateTime, true)}
+                              {item.isNew && <span className="new-badge">NEW</span>}
+                            </td>
                             <td className="quantity-cell">{item.quantity}</td>
                             <td className="item-name-cell">{item.name}</td>
                             <td className="rice-cell">{item.riceType || '-'}</td>

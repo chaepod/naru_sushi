@@ -70,3 +70,10 @@
     display: block;
   }
 }
+
+/* Hide navbar when printing */
+@media print {
+  .navbar {
+    display: none !important;
+  }
+}

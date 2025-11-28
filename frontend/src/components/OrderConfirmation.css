@@ -145,6 +145,20 @@
   background: #e0e0e0;
 }
 
+.secondary-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.print-hint {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+}
+
 .support-info {
   margin-top: 2rem;
   font-size: 0.9rem;
@@ -160,10 +174,244 @@
   text-decoration: underline;
 }
 
+.order-items-section {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.order-items-section h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e74c3c;
+}
+
+.order-items-list {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  background: white;
+  margin-bottom: 0.75rem;
+  border-radius: 4px;
+}
+
+.order-item-row:last-child {
+  margin-bottom: 0;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.item-details-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.25rem 0;
+}
+
+.item-notes-text {
+  font-size: 0.85rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.item-qty-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.item-quantity {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.item-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e74c3c;
+}
+
 @media print {
-  .action-buttons {
-    display: none;
+  .confirmation-page {
+    background: white;
+    padding: 0;
+    min-height: auto;
   }
+
+  .confirmation-container {
+    box-shadow: none;
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .success-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .action-buttons,
+  .print-hint {
+    display: none !important;
+  }
+
+  .support-info {
+    page-break-inside: avoid;
+  }
+
+  .order-items-section {
+    page-break-inside: avoid;
+  }
+
+  .order-item-row {
+    page-break-inside: avoid;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .confirmation-info {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  h1, h2, h3 {
+    color: #000 !important;
+  }
+
+  .order-number {
+    color: #000 !important;
+  }
+
+  .status-paid {
+    color: #000 !important;
+  }
+}
+
+/* PDF Export Styles - for more compact layout */
+.pdf-export.confirmation-container {
+  max-width: 600px;
+  padding: 1.25rem;
+  margin: 0 auto;
+}
+
+.pdf-export .success-icon {
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  margin: 0 auto 0.75rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-export h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.pdf-export .confirmation-message {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.pdf-export .order-details {
+  padding: 0.75rem;
+  margin: 1rem 0;
+}
+
+.pdf-export .detail-row {
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+}
+
+.pdf-export .order-items-section {
+  margin: 1rem 0;
+}
+
+.pdf-export .order-items-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+}
+
+.pdf-export .order-items-list {
+  padding: 0.5rem;
+}
+
+.pdf-export .order-item-row {
+  padding: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.pdf-export .item-name {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.pdf-export .item-details-text {
+  font-size: 0.8rem;
+  margin: 0.15rem 0;
+}
+
+.pdf-export .item-notes-text {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.pdf-export .item-quantity {
+  font-size: 0.8rem;
+}
+
+.pdf-export .item-price {
+  font-size: 0.95rem;
+}
+
+.pdf-export .confirmation-info {
+  margin: 1rem 0;
+  padding: 0.75rem;
+}
+
+.pdf-export .confirmation-info h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.pdf-export .confirmation-info li {
+  padding: 0.25rem 0;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+}
+
+.pdf-export .support-info {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}
+
+.pdf-export .action-buttons {
+  display: none;
 }
 
 /* Responsive */
@@ -174,5 +422,18 @@
 
   .action-buttons {
     flex-direction: column;
+  }
+
+  .order-item-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .item-qty-price {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-left: 0;
   }
 }
