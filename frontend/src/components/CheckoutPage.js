@@ -14,8 +14,6 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [customerInfo, setCustomerInfo] = useState({
-    parentName: '',
-    parentEmail: '',
     phone: ''
   });
   const [deliveryDate, setDeliveryDate] = useState('');
@@ -130,10 +128,7 @@ const CheckoutPage = () => {
   };
 
   const isCustomerInfoValid = () => {
-    return customerInfo.parentName &&
-           customerInfo.parentEmail &&
-           customerInfo.phone &&
-           customerInfo.parentEmail.includes('@') &&
+    return customerInfo.phone &&
            deliveryDate &&
            !dateError;
   };
@@ -176,14 +171,17 @@ const CheckoutPage = () => {
           <div className="cart-items-summary">
             {cart.map((item) => (
               <div key={item.cartId} className="checkout-item">
+                <img
+                  src={item.menuItem.image_url || "/images/placeholder.jpg"}
+                  alt={item.menuItem.name}
+                  className="item-image"
+                />
                 <div className="item-details">
                   <h3>{item.menuItem.name}</h3>
-                  <p className="item-meta">
-                    Student: {item.studentName} | Room: {item.roomNumber}
-                  </p>
-                  <p className="item-meta">
-                    School: {item.school} | Rice: {item.riceType}
-                  </p>
+                  <p className="item-meta">Student: {item.studentName}</p>
+                  <p className="item-meta">Room: {item.roomNumber}</p>
+                  <p className="item-meta">School: {item.school}</p>
+                  <p className="item-meta">Rice: {item.riceType}</p>
                   {item.notes && <p className="item-notes">Notes: {item.notes}</p>}
                 </div>
                 <div className="item-price">
@@ -201,32 +199,7 @@ const CheckoutPage = () => {
 
         {/* Customer Information */}
         <div className="customer-info-section">
-          <h2>Parent/Guardian Information</h2>
-          <div className="form-group">
-            <label htmlFor="parentName">Full Name *</label>
-            <input
-              type="text"
-              id="parentName"
-              name="parentName"
-              value={customerInfo.parentName}
-              onChange={handleCustomerInfoChange}
-              required
-              placeholder="Enter your full name"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="parentEmail">Email Address *</label>
-            <input
-              type="email"
-              id="parentEmail"
-              name="parentEmail"
-              value={customerInfo.parentEmail}
-              onChange={handleCustomerInfoChange}
-              required
-              placeholder="your.email@example.com"
-            />
-            <small>Order confirmation will be sent to this email</small>
-          </div>
+          <h2>Contact Information</h2>
           <div className="form-group">
             <label htmlFor="phone">Phone Number *</label>
             <input
@@ -238,6 +211,7 @@ const CheckoutPage = () => {
               required
               placeholder="021 234 5678"
             />
+            <small>We will contact you through this number if needed regarding any changes to your order.</small>
           </div>
         </div>
 
@@ -326,13 +300,7 @@ const CheckoutPage = () => {
 
         {clientSecret && !isCustomerInfoValid() && (
           <div className="info-required-message">
-            <p>⚠️ Please complete all required fields above to see payment options.</p>
-          </div>
-        )}
-
-        {!isCustomerInfoValid() && (
-          <div className="info-required-message">
-            <p>Please fill in all customer information fields to continue with payment.</p>
+            <p>⚠️ Please complete all required(*) fields above to see payment options.</p>
           </div>
         )}
       </div>
