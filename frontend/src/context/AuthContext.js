@@ -4,6 +4,7 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Check localStorage on mount to persist login
   useEffect(() => {
@@ -11,6 +12,7 @@ export function AuthProvider({ children }) {
     if (authStatus === 'true') {
       setIsAuthenticated(true);
     }
+    setIsLoading(false);
   }, []);
 
   const login = () => {
@@ -24,7 +26,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
